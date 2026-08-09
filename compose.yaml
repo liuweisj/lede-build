@@ -1,0 +1,29 @@
+name: lede-local
+
+services:
+  lede-builder:
+    platform: linux/arm64
+    image: lede-builder:ubuntu-22.04-arm64
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        BUILDER_UID: ${BUILDER_UID:-501}
+        BUILDER_GID: ${BUILDER_GID:-20}
+    init: true
+    environment:
+      LEDE_REPOSITORY: ${LEDE_REPOSITORY:-https://github.com/coolsnowwolf/lede.git}
+      LEDE_BRANCH: ${LEDE_BRANCH:-master}
+      LEDE_REF: ${LEDE_REF:-}
+      DOWNLOAD_JOBS: ${DOWNLOAD_JOBS:-8}
+      BUILD_JOBS: ${BUILD_JOBS:-8}
+    volumes:
+      - lede-work:/work
+      - lede-downloads:/downloads
+      - ./files/.config:/input/.config:ro
+      - ./scripts/build-openwrt.sh:/scripts/build-openwrt.sh:ro
+      - ./output:/output
+
+volumes:
+  lede-work:
+  lede-downloads:
